@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+    consul:
+        ports:
+             - "8500:8500"
+
+    valueservice.api:
+        environment:
+          - ASPNETCORE_ENVIRONMENT=Development
+          - ServiceConfig__Id=ValueService.Api-5010
+          - ServiceConfig__Name=ValueService
+          - ServiceConfig__DiscoveryAddress=http://consul:8500
+          - ServiceConfig__Address=valueservice.api
+          - ServiceConfig__Port=80
+          - ServiceConfig__HealthCheckEndPoint=healthcheck
+        ports:
+            - 5010:80
+        depends_on:
+            - consul
+    api.gateway:
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_URLS=http://+:80
+        ports:
+            - 5000:80
+        depends_on:
+            - consul
+            - valueservice.api
+          

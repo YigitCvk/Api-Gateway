@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+   consul:
+        image: consul:1.15.4
+        command: consul agent -dev -log-level=warn -ui -client=0.0.0.0
+        hostname: consul
+        container_name: consul
+        networks:
+            - common_network
+
+   valueservice.api:
+        container_name: valueservice.api
+        image: valueservice.api:latest
+        restart: on-failure
+        hostname: valueservice.api
+        build:
+            context: .
+            dockerfile: src/Services/ValueService.Api/Dockerfile
+        networks:
+            - common_network
+
+   api.gateway:
+        container_name: api.gateway
+        image: api.gateway:latest
+        restart: on-failure
+        hostname: api.gateway
+        build:
+            context: .
+            dockerfile: src/Gateway/Api.Gateway/Dockerfile
+        networks:
+            - common_network
+
+networks:
+    common_network:
+        driver: bridge
